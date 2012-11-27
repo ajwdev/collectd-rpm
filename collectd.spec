@@ -17,7 +17,7 @@ BuildPrereq:    yajl-devel
 Requires:   yajl    
 %endif
 Requires:   rrdtool, perl-Regexp-Common, libstatgrab, libesmtp, libxml2, liboping, libesmtp
-Packager:   RightScale <support@rightscale.com>
+Packager:   Intoximeters <devops@intoxitrack.net>
 Vendor:     collectd development team <collectd@verplant.org>
 
 %description
