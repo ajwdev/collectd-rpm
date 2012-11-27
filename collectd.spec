@@ -150,13 +150,22 @@ sed -i 's:#ReadThreads  5:ReadThreads  5:' $RPM_BUILD_ROOT/etc/collectd.conf
 ###Include broken out config directory
 echo -e '\nInclude "/etc/collectd.d"' >> $RPM_BUILD_ROOT/etc/collectd.conf
 
+# macro to grab binaries for a plugin, given a name
+%define contrib_conf_macro() \
+cp contrib/redhat/%1.conf $RPM_BUILD_ROOT/etc/collectd.d/%1.conf
+
 ##Move config contribs
-cp contrib/redhat/apache.conf $RPM_BUILD_ROOT/etc/collectd.d/apache.conf
-cp contrib/redhat/email.conf $RPM_BUILD_ROOT/etc/collectd.d/email.conf
-cp contrib/redhat/sensors.conf $RPM_BUILD_ROOT/etc/collectd.d/sensors.conf
-cp contrib/redhat/mysql.conf $RPM_BUILD_ROOT/etc/collectd.d/mysql.conf
-cp contrib/redhat/nginx.conf $RPM_BUILD_ROOT/etc/collectd.d/nginx.conf
-cp contrib/redhat/snmp.conf $RPM_BUILD_ROOT/etc/collectd.d/snmp.conf
+%contrib_conf_macro apache
+%contrib_conf_macro email
+%contrib_conf_macro sensors
+%contrib_conf_macro mysql
+%contrib_conf_macro nginx
+%contrib_conf_macro snmp
+%contrib_conf_macro postgresql
+%contrib_conf_macro libvirt
+%contrib_conf_macro varnish
+%contrib_conf_macro amqp
+%contrib_conf_macro ipmi
 
 %clean
 rm -rf $RPM_BUILD_ROOT
