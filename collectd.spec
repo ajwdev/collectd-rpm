@@ -1,20 +1,24 @@
 
 %define with_java %(test -z "$JAVA_HOME" ; echo $?)
 
-Summary:	Statistics collection daemon for filling RRD files.
-Name:		collectd
-Version:	5.0.1
-Release:	1%{?dist}
-Source:		http://collectd.org/files/%{name}-%{version}.tar.gz
-License:	GPL
-Group:		System Environment/Daemons
-BuildRoot:	%{_tmppath}/%{name}-%{version}-root
-BuildPrereq:	lm_sensors-devel, rrdtool-devel, libpcap-devel, net-snmp-devel, libstatgrab-devel, libxml2-devel, libiptcdata-devel
+Summary:    Statistics collection daemon for filling RRD files.
+Name:       collectd
+Version:    5.2.0
+Release:    1%{?dist}_intox
+Source:     http://collectd.org/files/%{name}-%{version}.tar.gz
+License:    GPL
+Group:      System Environment/Daemons
+BuildRoot:  %{_tmppath}/%{name}-%{version}-root
+BuildPrereq:    lm_sensors-devel, rrdtool-devel, libpcap-devel, net-snmp-devel, libstatgrab-devel, libxml2-devel, libiptcdata-devel,  libgcrypt-devel, liboping-devel, varnish-libs-devel
 # libcurl deps
-BuildPrereq:	curl-devel,libidn-devel,openssl-devel
-Requires:	rrdtool, perl-Regexp-Common, libstatgrab
-Packager:	RightScale <support@rightscale.com>
-Vendor:		collectd development team <collectd@verplant.org>
+BuildPrereq:    curl-devel,libidn-devel,openssl-devel
+%if 0%{?el6}
+BuildPrereq:    yajl-devel
+Requires:   yajl    
+%endif
+Requires:   rrdtool, perl-Regexp-Common, libstatgrab, libesmtp, libcurl, libxml2, liboping, libesmtp
+Packager:   RightScale <support@rightscale.com>
+Vendor:     collectd development team <collectd@verplant.org>
 
 %description
 collectd is a small daemon which collects system information periodically and
@@ -26,54 +30,90 @@ every 10 seconds.
 
 
 %package apache
-Summary:	apache-plugin for collectd.
-Group:		System Environment/Daemons
-Requires:	collectd = %{version}, curl
+Summary:    apache-plugin for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, curl
 %description apache
 This plugin collects data provided by Apache's `mod_status'.
 
 %package email
-Summary:	email-plugin for collectd.
-Group:		System Environment/Daemons
-Requires:	collectd = %{version}, spamassassin
+Summary:    email-plugin for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, spamassassin
 %description email
 This plugin collects data provided by spamassassin.
 
 %package mysql
-Summary:	mysql-module for collectd.
-Group:		System Environment/Daemons
-Requires:	collectd = %{version}, mysql
+Summary:    mysql-module for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, mysql
 %description mysql
 MySQL querying plugin. This plugins provides data of issued commands, called
 handlers and database traffic.
 
+%package postgresql
+Summary:    pq (Postgresql) modules for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, postgresql
+%description postgresql
+MySQL querying plugin. This plugins provides data of issued commands, called
+handlers and database traffic.
+
 %package nginx
-Summary:	nginx-plugin for collectd.
-Group:		System Environment/Daemons
-Requires:	collectd = %{version}, curl
+Summary:    nginx-plugin for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, curl
 %description nginx
 This plugin gets data provided by nginx.
 
 %package sensors
-Summary:	libsensors-module for collectd.
-Group:		System Environment/Daemons
-Requires:	collectd = %{version}, lm_sensors
+Summary:    libsensors-module for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, lm_sensors
 %description sensors
 This plugin for collectd provides querying of sensors supported by lm_sensors.
 
 %package snmp
-Summary:	snmp-module for collectd.
-Group:		System Environment/Daemons
-Requires:	collectd = %{version}, net-snmp
+Summary:    snmp-module for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, net-snmp
 %description snmp
 This plugin for collectd allows querying of network equipment using SNMP.
 
+%package amqp
+Summary:    AMQP modules for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, librabbitmq-devel
+%description amqp
+This plugin for collectd allows querying of AMQP queues.
+
+%package ipmi
+Summary:    IPMI modules for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, OpenIPMI
+%description ipmi
+This plugin for collectd allows querying IPMI.
+
+%package libvirt
+Summary:    libvirt modules for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, libvirt
+%description libvirt
+This plugin for collectd allows querying hypervisors via libvirt.
+
+%package varnish
+Summary:    varnish modules for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, varnish-libs
+%description varnish
+This plugin for collectd allows querying the Varnish HTTP accelerator.
+
 %if %with_java
 %package java
-Summary:	java-module for collectd.
-Group:		System Environment/Daemons
-Requires:	collectd = %{version}, jdk >= 1.6
-BuildPrereq:	jdk >= 1.6
+Summary:    java-module for collectd.
+Group:      System Environment/Daemons
+Requires:   collectd = %{version}, jdk >= 1.6
+BuildPrereq:    jdk >= 1.6
 %description java
 This plugin for collectd allows plugins to be written in Java and executed
 in an embedded JVM.
@@ -84,9 +124,9 @@ rm -rf $RPM_BUILD_ROOT
 %setup
 
 %build
-./configure CFLAGS=-"DLT_LAZY_OR_NOW='RTLD_LAZY|RTLD_GLOBAL'" --prefix=%{_prefix} --sbindir=%{_sbindir} --mandir=%{_mandir} --libdir=%{_libdir} --sysconfdir=%{_sysconfdir} \
+./configure CFLAGS=-"DLT_LAZY_OR_NOW='RTLD_LAZY|RTLD_GLOBAL'" --prefix=%{_prefix} --sbindir=%{_sbindir} --mandir=%{_mandir} --libdir=%{_libdir} --sysconfdir=%{_sysconfdir} --disable-ipvs \
     %{!?with_java:"--with-java=$JAVA_HOME --enable-java"} \
-    --disable-battery
+    --disable-battery %{?el5:--disable-python} %{?el6:--disable-perl}
 make
 
 %install
@@ -148,10 +188,30 @@ exit 0
 %attr(0755,root,root) %{_sbindir}/collectd
 %attr(0755,root,root) %{_bindir}/collectd-nagios
 %attr(0755,root,root) %{_bindir}/collectdctl
+%attr(0755,root,root) %{_bindir}/collectd-tg
 %attr(0755,root,root) %{_sbindir}/collectdmon
 %attr(0644,root,root) %{_mandir}/man1/*
 %attr(0644,root,root) %{_mandir}/man5/*
 %dir /etc/collectd.d
+
+%attr(0644,root,root) /usr/include/collectd/network.h
+%attr(0644,root,root) /usr/include/collectd/network_buffer.h
+%if 0%{?el5}
+%attr(0644,root,root) %{_mandir}/man3/Collectd::Unixsock.3pm.gz
+%attr(0644,root,root) /usr/lib/perl5/site_perl/5.8.8/Collectd.pm
+%attr(0644,root,root) /usr/lib/perl5/site_perl/5.8.8/Collectd/Plugins/OpenVZ.pm
+%attr(0644,root,root) /usr/lib/perl5/site_perl/5.8.8/Collectd/Unixsock.pm
+%attr(0644,root,root) %{_libdir}/perl5/site_perl/5.8.8/x86_64-linux-thread-multi/auto/Collectd/.packlist
+%attr(0644,root,root) %{_libdir}/perl5/5.8.8/x86_64-linux-thread-multi/perllocal.pod
+%endif
+%if 0%{?el6}
+%attr(0644,root,root) /usr/man/man3/Collectd::Unixsock.3pm.gz
+%attr(0644,root,root) /usr/lib/perl5/Collectd.pm
+%attr(0644,root,root) /usr/lib/perl5/Collectd/Plugins/OpenVZ.pm
+%attr(0644,root,root) /usr/lib/perl5/Collectd/Unixsock.pm
+%attr(0644,root,root) /usr/lib/perl5/x86_64-linux-thread-multi/auto/Collectd/.packlist
+%attr(0644,root,root) /usr/lib/perl5/x86_64-linux-thread-multi/perllocal.pod
+%endif
 
 # client
 %attr(0644,root,root) /usr/include/collectd/client.h
@@ -186,7 +246,6 @@ exit 0
 %plugin_macro fscache
 %plugin_macro hddtemp
 %plugin_macro interface
-%plugin_macro iptables
 %plugin_macro irq
 %plugin_macro load
 %plugin_macro logfile
@@ -199,7 +258,6 @@ exit 0
 %plugin_macro match_value
 
 %plugin_macro mbmon
-%plugin_macro memcachec
 %plugin_macro memcached
 %plugin_macro memory
 %plugin_macro multimeter
@@ -208,11 +266,9 @@ exit 0
 %plugin_macro ntpd
 %plugin_macro openvpn
 %plugin_macro olsrd
-%plugin_macro perl
 %plugin_macro powerdns
 %plugin_macro processes
 %plugin_macro protocols
-%plugin_macro python
 %plugin_macro rrdtool
 %plugin_macro serial
 %plugin_macro sensors
@@ -242,15 +298,25 @@ exit 0
 %plugin_macro wireless
 %plugin_macro write_http
 
-%attr(0644,root,root) %{_datadir}/%{name}/types.db
+%plugin_macro write_graphite
+%plugin_macro numa
+%plugin_macro md
+%plugin_macro aggregation
+%plugin_macro ping
+%plugin_macro notify_email
 
-%exclude %{_libdir}/perl5/5.8.8/%{_arch}-linux-thread-multi/perllocal.pod
-%attr(0644,root,root) %{_libdir}/perl5/site_perl/5.8.8/%{_arch}-linux-thread-multi/auto/Collectd/.packlist
-%attr(0644,root,root) /usr/lib/perl5/site_perl/5.8.8/Collectd.pm
-%attr(0644,root,root) /usr/lib/perl5/site_perl/5.8.8/Collectd/Unixsock.pm
-%attr(0644,root,root) /usr/lib/perl5/site_perl/5.8.8/Collectd/Plugins/OpenVZ.pm
-%attr(0644,root,root) /usr/lib/perl5/site_perl/5.8.8/Collectd/Plugins/Monitorus.pm
-%attr(0644,root,root) /usr/share/man/man3/Collectd::Unixsock.3pm.gz
+%if 0%{?el5}
+%plugin_macro perl
+%endif
+
+%if 0%{?el6}
+%plugin_macro python
+%plugin_macro iptables
+%plugin_macro ethstat
+%plugin_macro curl_json
+%endif
+
+%attr(0644,root,root) %{_datadir}/%{name}/types.db
 
 %exclude /usr/share/collectd/postgresql_default.conf
 
@@ -289,7 +355,31 @@ exit 0
 %attr(0644,root,root) /etc/collectd.d/snmp.conf
 %plugin_macro snmp
 
+%files amqp
+%plugin_macro amqp
+%attr(0644,root,root) /etc/collectd.d/amqp.conf
+
+%files postgresql
+%plugin_macro postgresql
+%attr(0644,root,root) /etc/collectd.d/postgresql.conf
+
+%files ipmi
+%plugin_macro ipmi
+%attr(0644,root,root) /etc/collectd.d/ipmi.conf
+
+%files libvirt
+%plugin_macro libvirt
+%attr(0644,root,root) /etc/collectd.d/libvirt.conf
+
+%files varnish
+%plugin_macro varnish
+%attr(0644,root,root) /etc/collectd.d/varnish.conf
+
 %changelog
+* Tue Nov 27 2012 Intoximeters Inc <devops@intoxitrack.net> 5.2.0
+- New upstream version
+- Changes to support 5.2.0
+
 * Tue Jan 03 2011 Monetate <jason.stelzer@monetate.com> 5.0.1
 - New upstream version
 - Changes to support 5.0.1
