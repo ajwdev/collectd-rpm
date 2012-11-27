@@ -356,24 +356,24 @@ exit 0
 %plugin_macro snmp
 
 %files amqp
+%config %attr(0644,root,root) /etc/collectd.d/amqp.conf
 %plugin_macro amqp
-%attr(0644,root,root) /etc/collectd.d/amqp.conf
 
 %files postgresql
+%config %attr(0644,root,root) /etc/collectd.d/postgresql.conf
 %plugin_macro postgresql
-%attr(0644,root,root) /etc/collectd.d/postgresql.conf
 
 %files ipmi
+%config %attr(0644,root,root) /etc/collectd.d/ipmi.conf
 %plugin_macro ipmi
-%attr(0644,root,root) /etc/collectd.d/ipmi.conf
 
 %files libvirt
+%config %attr(0644,root,root) /etc/collectd.d/libvirt.conf
 %plugin_macro libvirt
-%attr(0644,root,root) /etc/collectd.d/libvirt.conf
 
 %files varnish
+%config %attr(0644,root,root) /etc/collectd.d/varnish.conf
 %plugin_macro varnish
-%attr(0644,root,root) /etc/collectd.d/varnish.conf
 
 %changelog
 * Tue Nov 27 2012 Intoximeters Inc <devops@intoxitrack.net> 5.2.0
