@@ -124,9 +124,9 @@ rm -rf $RPM_BUILD_ROOT
 %setup
 
 %build
-./configure CFLAGS=-"DLT_LAZY_OR_NOW='RTLD_LAZY|RTLD_GLOBAL'" --prefix=%{_prefix} --sbindir=%{_sbindir} --mandir=%{_mandir} --libdir=%{_libdir} --sysconfdir=%{_sysconfdir} --localstatedir=/var --disable-ipvs \
+./configure CFLAGS=-"DLT_LAZY_OR_NOW='RTLD_LAZY|RTLD_GLOBAL'" --prefix=%{_prefix} --sbindir=%{_sbindir} --mandir=%{_mandir} --libdir=%{_libdir} --sysconfdir=%{_sysconfdir} --localstatedir=/var \
     %{!?with_java:"--with-java=$JAVA_HOME --enable-java"} \
-    --disable-battery %{?el5:--disable-python} %{?el6:--disable-perl}
+    --disable-battery --disable-ipvs %{?el5:--disable-python} %{?el6:--disable-perl}
 make
 
 %install
