@@ -1,0 +1,10 @@
+2012-11-27
+    * Add prep.sh and GPL license
+
+	* Move *.conf files to the 'src/' directory
+
+2012-11-28
+    * Modified collectd.spec
+    
+    * Added ampq.conf, postgresql.conf, ipmi.conf, libvirt.conf,
+      and varnish.conf
