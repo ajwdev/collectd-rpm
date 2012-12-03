@@ -16,7 +16,7 @@ BuildPrereq:    curl-devel,libidn-devel,openssl-devel
 BuildPrereq:    yajl-devel
 Requires:   yajl    
 %endif
-Requires:   rrdtool, perl-Regexp-Common, libstatgrab, libesmtp, libxml2, liboping, libesmtp
+Requires:   rrdtool, perl-Regexp-Common, libstatgrab, libesmtp, libxml2, liboping
 Packager:   Intoximeters <devops@intoxitrack.net>
 Vendor:     collectd development team <collectd@verplant.org>
 
